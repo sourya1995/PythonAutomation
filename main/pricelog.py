@@ -1,5 +1,6 @@
 import delorean
 from decimal import Decimal
+import parse
 
 class PriceLog(object):
     def __init__(self, timestamp, product_id, price):
@@ -11,9 +12,12 @@ class PriceLog(object):
     
     @classmethod
     def parse(cls, text_log):
-        divide_it = text_log.split(' - ')
-        tmp_string, _, product_string, price_string = divide_it
-        timestamp = delorean.parse(tmp_string.strip('[]'))
-        product_id = int(product_string.split(':')[-1])
-        price = Decimal(price_string.split('$')[-1])
-        return cls(timestamp=timestamp, product_id=product_id, price=price)
+
+        def price(string):
+            return Decimal(string)
+        def isodate(string):
+            return delorean.parse(string)
+        FORMAT = ('[{timestamp:isodate}] - SALE - PRODUCT: {product:d}- ''PRICE: ${price:price}')
+        formats = { 'price': price, 'isodate': isodate}
+        result = parse.parse(FORMAT, text_log, formats=formats)
+        return cls(timestamp=result['timestamp'], product_id=result['product'], price=result['price'])
