@@ -1,5 +1,5 @@
 import argparse
-import configparser
+import yaml
 import sys
 
 def main(number, other_number, output):
@@ -14,7 +14,7 @@ if __name__ == '__main__':
     parser.add_argument('-o', dest='output', type=argparse.FileType('w'), help='output file', default=sys.stdout)
     args = parser.parse_args()
     if args.config:
-        config = configparser.ConfigParser()
+        config = yaml.load(args.config, Loader=yaml.FullLoader)
         config.read_file(args.config)
         args.n1 = int(config['ARGUMENTS']['n1'])
         args.n2 = int(config['ARGUMENTS']['n2'])
