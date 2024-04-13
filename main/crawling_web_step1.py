@@ -87,7 +87,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument(dest='url', type=str, help='Base site url')
     parser.add_argument('-p', type=str, help=f'Sentence to search, default: {DEFAULT_PHRASE}', default=DEFAULT_PHRASE)
-    parser.add_argument('-w', type=int, help='Number of workers, default: 10', default=10))
+    parser.add_argument('-w', type=int, help='Number of workers, default: 10', default=10)
     args = parser.parse_args()
     logging.basicConfig(level=logging.INFO)
     main(args.url, args.p)
