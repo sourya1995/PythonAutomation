@@ -5,6 +5,7 @@ import http.client
 import re
 from urllib.parse import urlparse, urljoin
 from bs4 import BeautifulSoup
+import concurrent.futures
 
 DEFAULT_PHRASE = 'python'
 
@@ -14,16 +15,16 @@ def process_link(source_link, text):
     result = requests.get(source_link)
     if result.status_code != http.client.OK:
         logging.error(f'Error retrieving {source_link}: {result}')
-        return []
+        return source_link, []
     
     if 'html' not in result.headers['Content-Type']:
         logging.info(f'Link {source_link} is not an HTML page')
-        return []
+        return source_link, []
     
     page = BeautifulSoup(result.text, 'html.parser')
     search_text(source_link, page, text)
 
-    return get_links(parsed_source, page) 
+    return source_link, get_links(parsed_source, page) 
 
 
 def get_links(parsed_source, page):
@@ -57,20 +58,28 @@ def search_text(source_link, page, text):
         print(f'Link {source_link}: --> {element}')
 
 
-def main(base_url, to_search):
+def main(base_url, to_search, workers):
     checked_links = set()
     to_check = [base_url]
     max_checks = 10
 
-    while to_check and max_checks:
-        link = to_check.pop(0)
-        links = process_link(link, text=to_search)
-        checked_links.add(link)
-        for link in links:
-            if link not in checked_links:
+
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as executor:
+        while to_check:
+            futures = [executor.submit(process_link, url, to_search) for link in to_check]
+            to_check = []
+            for data in concurrent.futures.as_completed(futures):
+                link, new_links = data.result()
                 checked_links.add(link)
-                to_check.append(link)
-        max_checks -= 1
+                for link in new_links:
+                    if link not in checked_links and link not in to_check:
+                        to_check.append(link)
+
+                max_checks -= 1
+                if not max_checks:
+                    return
+
 
 
 
