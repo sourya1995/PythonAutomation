@@ -1,3 +1,6 @@
 requirements.txt
 *.ini
 *.log
+*.txt
+*.pdf
+*.csv
