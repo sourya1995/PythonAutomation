@@ -3,8 +3,10 @@ import sys
 
 def find_duplicates(filenames):
     matches = []
-    for left in filenames:
-        for right in filenames:
+    for i_left in range(len(filenames)):
+        left = filenames[i_left]
+        for i_right in range(i_left): #files coming BEFORE ileft
+            right = filenames[i_right]
             if(same_bytes(left, right)):
                 matches.append((left, right))
     return matches
