@@ -1,5 +1,16 @@
 import sys
 
+def naive_hash(data):
+    return sum(data) % 13
+
+def find_groups(filenames):
+    groups = {}
+    for filename in filenames:
+        hash = naive_hash(open(filename, 'rb').read())
+        if hash not in groups:
+            groups[hash] = set()
+        groups[hash].add(filename)
+    return groups
 
 def find_duplicates(filenames):
     matches = []
