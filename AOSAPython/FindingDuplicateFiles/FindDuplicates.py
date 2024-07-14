@@ -1,4 +1,5 @@
 import sys
+from hashlib import sha256
 
 def naive_hash(data):
     return sum(data) % 13
@@ -6,10 +7,10 @@ def naive_hash(data):
 def find_groups(filenames):
     groups = {}
     for filename in filenames:
-        hash = naive_hash(open(filename, 'rb').read())
-        if hash not in groups:
-            groups[hash] = set()
-        groups[hash].add(filename)
+        file_hash = sha256(open(filename, 'rb').read()).hexdigest()
+        if file_hash not in groups:
+            groups[file_hash] = set()
+        groups[file_hash].add(filename)
     return groups
 
 def find_duplicates(filenames):
@@ -29,6 +30,8 @@ def same_bytes(leftname, rightname):
     
     
 if __name__ == '__main__':
-    duplicates = find_duplicates(sys.argv[1:])
-    for (left, right) in duplicates:
-        print(f'{left} and {right}')
+    groups = find_groups(sys.argv[1:])
+    for filenames in groups.values:
+        duplicates = find_duplicates(list(filenames))
+        for (left, right) in duplicates:
+            print(f'{left} and {right}')
