@@ -12,15 +12,10 @@ class Client(object):
 
     def get(self) ->  str:
         body = requests.get(self.url, verify=self.ssl_verify).content
-        return json.loads(body)
+        return json.loads(body) #JSON string to dictionary
     
 
 if __name__ == "__main__":
-    client_verify = Client('https://self-signed-badssl.com')
-    try:
-        print(client_verify.get())
-    except Exception as e:
-        print("Caught Exception:", e)
-    
-    client_verify_cert = Client('https://self-signed-badssl.com', cert_path=str("badssl-com.pem"))
-    print(client_verify_cert.get())
+    client  = Client('https://api.met.no/weatherapi/airqualityforecast/0.1/stations')
+    stations = client.get()
+    print("Name of the first station :" + stations[0].get('name')) #return the name of the first station
