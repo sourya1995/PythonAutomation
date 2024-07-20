@@ -20,6 +20,9 @@ for key, value in ages.items():
 for key in ages:
     print(key)
 
+for item in ages.keys():
+    print(item + "is awesome")
+
 for value in ages.values():
     print(value)
 
